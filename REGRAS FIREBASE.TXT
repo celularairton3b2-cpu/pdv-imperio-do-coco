@@ -1,0 +1,91 @@
+rules_version = '2';
+
+// ============================================================
+// REGRAS DE SEGURANÇA - Imperador do Coco
+// ============================================================
+// Cada pessoa loga com usuário e senha (Firebase Authentication) e tem
+// um documento em usuarios/{uid} com um campo "role":
+//   "pendente" -> acabou de se cadastrar, ainda sem nenhum acesso
+//   "padrao"   -> pode LER clientes/entregas/pagamentos (só visualizar)
+//   "admin"    -> pode LER e ESCREVER (criar/editar/excluir)
+//
+// IMPORTANTE: ninguém consegue virar "admin" sozinho. O primeiro admin
+// precisa ser definido manualmente uma vez no Firebase Console (veja o
+// passo a passo). Depois disso, admins promovem outras pessoas pelo
+// próprio app, na aba "Usuários".
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role;
+    }
+
+    function ehAdmin() {
+      return logado() && role() == 'admin';
+    }
+
+    function podeVer() {
+      return logado() && (role() == 'admin' || role() == 'padrao');
+    }
+
+    match /usuarios/{uid} {
+      allow create: if logado() && request.auth.uid == uid && request.resource.data.role == 'pendente';
+      allow get: if logado() && (request.auth.uid == uid || ehAdmin());
+      allow list: if ehAdmin();
+      allow update: if logado() && ((request.auth.uid == uid && request.resource.data.role == resource.data.role) || ehAdmin());
+      allow delete: if ehAdmin();
+    }
+
+    match /clientes/{document=**} {
+      allow read: if podeVer();
+      allow write: if ehAdmin();
+    }
+    match /entregas/{document=**} {
+      allow read: if podeVer();
+      allow write: if ehAdmin();
+    }
+    match /pagamentos/{document=**} {
+      allow read: if podeVer();
+      allow write: if ehAdmin();
+    }
+
+    // =========================================================
+    // CUSTOS E FORNECEDORES
+    // =========================================================
+    match /fornecedores/{document=**} {
+      allow read, write: if logado();
+    }
+    match /compras/{document=**} {
+      allow read, write: if logado();
+    }
+    match /despesas/{document=**} {
+      allow read, write: if logado();
+    }
+    match /pagamentos_fornecedor/{document=**} {
+      allow read, write: if logado();
+    }
+
+    // =========================================================
+    // EXTRATOS PÚBLICOS DOS CLIENTES
+    // =========================================================
+    match /extratos/{token} {
+      allow read: if true;
+      allow write: if ehAdmin();
+    }
+
+    // =========================================================
+    // AUDITORIA (LOGS) - Imutável
+    // =========================================================
+    match /logs/{document=**} {
+      allow create: if logado();
+      allow read: if ehAdmin();
+      allow update, delete: if false; // Ninguém edita ou apaga logs
+    }
+  }
+}

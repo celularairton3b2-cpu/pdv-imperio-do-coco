@@ -1,0 +1,31 @@
+{
+  "name": "Coco da Praia - Controle de Vendas",
+  "short_name": "Coco da Praia",
+  "description": "App de controle de entregas, preços e pagamentos de coco verde",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B3D3A",
+  "theme_color": "#0B3D3A",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

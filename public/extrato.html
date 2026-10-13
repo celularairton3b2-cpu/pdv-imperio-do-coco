@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Meu extrato — IMPÉRIO DO COCO</title>
+<meta name="theme-color" content="#0B3D3A">
+<link rel="icon" href="icons/icon-192.png?v=novo">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { max-width: 480px; margin: 0 auto; padding: 24px 16px 40px; }
+  .extrato-header { text-align: center; margin-bottom: 20px; }
+  .extrato-header img { width: 56px; height: 56px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+  <div class="extrato-header">
+    <img src="img/logo.png" alt="IMPÉRIO DO COCO">
+    <h2 id="extrato-nome">Carregando...</h2>
+  </div>
+
+  <div class="card">
+    <div class="total-preview" style="margin-bottom:0">
+      <span class="label">Saldo atual</span>
+      <span class="value" id="extrato-saldo">R$ 0,00</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="total-preview" style="margin-bottom:0">
+      <span class="label">Total de cocos recebidos</span>
+      <span class="value" id="extrato-cocos">0</span>
+    </div>
+  </div>
+
+  <div class="helper-text" id="extrato-atualizado" style="margin-top:14px; text-align:center"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+  function formatMoney(v) {
+    return (v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("t");
+
+  if (!token) {
+    document.getElementById("extrato-nome").textContent = "Link inválido.";
+  } else {
+    db.collection("extratos").doc(token).get().then((doc) => {
+      if (!doc.exists) {
+        document.getElementById("extrato-nome").textContent = "Extrato não encontrado.";
+        return;
+      }
+      const d = doc.data();
+      document.getElementById("extrato-nome").textContent = d.clienteNome || "Cliente";
+
+      const saldoEl = document.getElementById("extrato-saldo");
+      saldoEl.textContent = formatMoney(d.saldo);
+      saldoEl.style.color = (d.saldo > 0.01) ? "var(--danger)" : "var(--positive)";
+
+      document.getElementById("extrato-cocos").textContent = d.totalCocos || 0;
+
+      if (d.atualizadoEm) {
+        const dt = d.atualizadoEm.toDate();
+        document.getElementById("extrato-atualizado").textContent = "Atualizado em " + dt.toLocaleString("pt-BR");
+      }
+    }).catch((err) => {
+      console.error(err);
+      document.getElementById("extrato-nome").textContent = "Não foi possível carregar.";
+    });
+  }
+</script>
+</body>
+</html>

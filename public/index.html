@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>IMPÉRIO DO COCO</title>
+<meta name="theme-color" content="#0B3D3A">
+<link rel="icon" href="icons/icon-192.png?v=novo">
+<link rel="apple-touch-icon" href="icons/icon-192.png?v=novo">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IMPÉRIO DO COCO">
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+  /* ======================================================= */
+  /* MODO ÚNICO (MENU SEMPRE EM BAIXO)                       */
+  /* ======================================================= */
+  .tabbar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    z-index: 90 !important;
+    background-color: #FFFFFF !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    border-top: 1px solid rgba(0,0,0,0.05) !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    white-space: nowrap !important;
+  }
+  
+  .tab-btn {
+    min-width: 72px !important;
+  }
+
+  main {
+    padding-bottom: 90px !important;
+  }
+  
+  .sheet-backdrop {
+    z-index: 9999 !important;
+  }
+  
+  .toast {
+    z-index: 10000 !important;
+  }
+
+  /* FORÇAR CENTRALIZAÇÃO E ESPAÇAMENTO DOS BOTÕES DE FILTRO */
+  .chip-row {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .chip {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 12px 24px !important;
+    border-radius: 30px !important;
+    min-width: 130px !important;
+    text-align: center !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= TELA: LOGIN ======================= -->
+<div id="screen-login" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo"><img src="img/logo.png" alt="IMPÉRIO DO COCO"></div>
+    <h1>IMPÉRIO DO COCO</h1>
+    <p class="auth-sub">Controle de entregas, clientes e pagamentos</p>
+    <div class="field">
+      <label for="login-usuario">Usuário</label>
+      <input type="text" id="login-usuario" placeholder="Seu usuário" autocapitalize="off" autocorrect="off">
+    </div>
+    <div class="field">
+      <label for="login-senha">Senha</label>
+      <input type="password" id="login-senha" placeholder="Sua senha">
+    </div>
+    <div class="helper-text" id="login-erro" style="color:var(--danger);display:none"></div>
+    <button class="btn btn-primary" id="btn-login-entrar">Entrar</button>
+    <p class="auth-footnote">Não tem conta ainda? <a href="#" class="link-plain" id="link-ir-criar-conta">Criar uma agora</a></p>
+  </div>
+</div>
+
+<!-- ======================= TELA: CRIAR CONTA ======================= -->
+<div id="screen-criar-google" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo"><img src="img/logo.png" alt="IMPÉRIO DO COCO"></div>
+    <h2>Criar conta</h2>
+    <p class="auth-sub">Pra criar uma conta nova, primeiro confirme sua identidade com o Google.</p>
+    <button class="btn btn-google" id="btn-google-verificar">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.63z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.85.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.68 9c0-.59.1-1.16.27-1.7V4.97H.98A9 9 0 000 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 00.98 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      Continuar com Google
+    </button>
+    <button class="btn btn-outline" id="btn-voltar-login-1" style="margin-top:10px">Voltar</button>
+  </div>
+</div>
+
+<div id="screen-completar" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo"><img src="img/logo.png" alt="IMPÉRIO DO COCO"></div>
+    <h2>Quase lá!</h2>
+    <p class="auth-sub">Identidade confirmada. Agora crie o usuário e a senha que você vai usar pra entrar da próxima vez.</p>
+    <div class="field">
+      <label for="c-nome">Seu nome</label>
+      <input type="text" id="c-nome" placeholder="Como quer ser chamado(a)">
+    </div>
+    <div class="field">
+      <label for="c-usuario">Escolha um usuário</label>
+      <input type="text" id="c-usuario" placeholder="Ex: joao (sem espaço ou acento)" autocapitalize="off" autocorrect="off">
+    </div>
+    <div class="field">
+      <label for="c-senha">Crie uma senha</label>
+      <input type="password" id="c-senha" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="field">
+      <label for="c-senha2">Confirme a senha</label>
+      <input type="password" id="c-senha2" placeholder="Repita a senha">
+    </div>
+    <div class="helper-text" id="completar-erro" style="color:var(--danger);display:none"></div>
+    <button class="btn btn-primary" id="btn-completar-cadastro">Concluir cadastro</button>
+    <button class="btn btn-outline" id="btn-cancelar-completar" style="margin-top:10px">Cancelar</button>
+  </div>
+</div>
+
+<div id="screen-aguardando" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">⏳</div>
+    <h2>Cadastro enviado!</h2>
+    <p class="auth-sub" id="aguardando-texto">Peça para um administrador liberar seu acesso no app.</p>
+    <button class="btn btn-outline" id="btn-sair-aguardando">Sair</button>
+  </div>
+</div>
+
+<!-- ======================= APP PRINCIPAL ======================= -->
+<div id="app" style="display:none">
+
+  <header class="topbar">
+    <div class="logo-dot">🥥</div>
+    <div class="titles">
+      <h1>IMPÉRIO DO COCO</h1>
+      <div class="subtitle" id="topbar-date">—</div>
+    </div>
+    <div class="sync-dot" id="sync-dot" title="conectando..."></div>
+    <button class="topbar-user" id="btn-menu-usuario" title="Sua conta"><span id="topbar-user-inicial">?</span></button>
+  </header>
+
+  <main>
+    <section id="view-dre" class="view">
+      <div class="section-title">Demonstração do Resultado</div>
+      <div class="chip-row">
+        <button class="chip active" data-relatorio="dre">DRE (lucro)</button>
+        <button class="chip" data-relatorio="caixa">Fluxo de Caixa</button>
+      </div>
+      <div class="chip-row">
+        <button class="chip" data-periodo-dre="7">7 dias</button>
+        <button class="chip active" data-periodo-dre="30">Este mês</button>
+        <button class="chip" data-periodo-dre="tudo">Tudo</button>
+        <button class="chip" data-periodo-dre="personalizado">Período</button>
+      </div>
+
+      <div class="field" id="campo-dre-periodo" style="display:none; flex-direction: row; gap: 10px; margin-bottom: 20px;">
+        <div style="flex:1">
+          <label style="font-size: 13px; color: #4B6461; margin-bottom: 4px; display: block;">Data inicial</label>
+          <input type="date" id="dre-data-inicio" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; font-family: inherit; font-size: 16px; background: transparent;">
+        </div>
+        <div style="flex:1">
+          <label style="font-size: 13px; color: #4B6461; margin-bottom: 4px; display: block;">Data final</label>
+          <input type="date" id="dre-data-fim" style="padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 100%; font-family: inherit; font-size: 16px; background: transparent;">
+        </div>
+      </div>
+
+      <div id="bloco-dre">
+        <div class="tiles">
+          <div class="tile"><div class="num" id="dre-receita">R$ 0</div><div class="cap">Receita (Entregas)</div></div>
+          <div class="tile alt" style="background:var(--danger)"><div class="num" id="dre-custos">R$ 0</div><div class="cap">Custos + Gastos</div></div>
+        </div>
+        <div class="card">
+          <div class="total-preview" style="margin-bottom: 0; background: var(--positive-bg);">
+            <span class="label" style="color: var(--positive)">Lucro Líquido</span>
+            <span class="value" id="dre-lucro" style="color: var(--positive)">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="section-title">Detalhado por dia</div>
+        <div class="card" id="dre-lista-card"><div id="dre-lista"></div></div>
+      </div>
+
+      <div id="bloco-caixa" style="display:none">
+        <div class="tiles">
+          <div class="tile"><div class="num" id="caixa-entradas">R$ 0</div><div class="cap">Entradas (recebido)</div></div>
+          <div class="tile alt" style="background:var(--danger)"><div class="num" id="caixa-saidas">R$ 0</div><div class="cap">Saídas (pago)</div></div>
+        </div>
+        <div class="card">
+          <div class="total-preview" id="caixa-saldo-preview" style="margin-bottom: 0;">
+            <span class="label">Saldo do período</span>
+            <span class="value" id="caixa-saldo">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="section-title">Detalhado por dia</div>
+        <div class="card" id="caixa-lista-card"><div id="caixa-lista"></div></div>
+      </div>
+    </section>
+
+    <section id="view-entregar" class="view active">
+      <div class="section-title">Nova entrega</div>
+      <div id="entrega-sem-clientes" class="card" style="display:none">
+        <div class="empty-state">
+          <span class="emoji">🥥</span><div class="title">Cadastre seu primeiro cliente</div><div class="desc">Antes de registrar uma entrega, cadastre o cliente com o preço do coco combinado com ele.</div>
+        </div>
+        <button class="btn btn-primary" id="btn-ir-cadastrar">Cadastrar cliente</button>
+      </div>
+      
+      <div class="card" id="entrega-form-card">
+        <div class="field"><label for="entrega-cliente">Cliente</label><select id="entrega-cliente"></select></div>
+        <div class="field">
+          <label for="entrega-qtd">Quantidade de cocos</label>
+          <div class="stepper">
+            <button type="button" id="qtd-menos">−</button>
+            <input type="number" id="entrega-qtd" inputmode="numeric" min="0" placeholder="0">
+            <button type="button" id="qtd-mais">+</button>
+          </div>
+        </div>
+        <div class="field"><label for="entrega-data">Data da entrega</label><input type="date" id="entrega-data"></div>
+        <div class="total-preview"><span class="label">Total da entrega</span><span class="value" id="entrega-total-preview">R$ 0,00</span></div>
+        <button class="btn btn-primary" id="btn-salvar-entrega">Salvar Nova entrega</button>
+      </div>
+      
+      <div class="card" id="entrega-view-only" style="display:none">
+        <div class="empty-state"><span class="emoji">👀</span><div class="title">Modo visualização</div><div class="desc">Seu acesso é só para consulta.</div></div>
+      </div>
+      
+      <div class="section-title">Hoje</div>
+      <div class="tiles">
+        <div class="tile"><div class="num" id="hoje-cocos">0</div><div class="cap">cocos entregues</div></div>
+        <div class="tile alt"><div class="num" id="hoje-valor">R$ 0</div><div class="cap">faturado hoje</div></div>
+      </div>
+      
+      <div class="tile" style="display: block; margin-top: 12px; margin-bottom: 14px !important; width: 100%; box-sizing: border-box; padding: 24px 20px; text-align: center;">
+        <div class="num" id="entrega-estoque-atual" style="font-size: 34px; line-height: 1;">0 cocos</div>
+        <div class="cap" style="font-size: 18px; margin-top: 8px; font-weight: 500;">📦 Estoque disponível</div>
+      </div>
+      
+      <div class="card" id="hoje-lista-card"><div id="hoje-lista"></div></div>
+    </section>
+
+    <section id="view-clientes" class="view">
+      <div class="search-box"><input type="text" id="busca-cliente" placeholder="Buscar cliente pelo nome..."></div>
+      <button class="btn btn-primary" id="fab-add-cliente" style="margin-bottom:14px">Adicionar cliente</button>
+      <div class="card" id="clientes-lista-card"><div id="clientes-lista"></div></div>
+    </section>
+
+    <section id="view-pagamentos" class="view">
+      <div class="tiles">
+        <div class="tile"><div class="num" id="pend-total-cocos">0</div><div class="cap">clientes com saldo</div></div>
+        <div class="tile alt"><div class="num" id="pend-total-valor">R$ 0</div><div class="cap">a receber</div></div>
+      </div>
+      <div class="chip-row">
+        <button class="chip active" data-filter-pag="pendentes">Com saldo</button>
+        <button class="chip" data-filter-pag="todos">Todos os clientes</button>
+      </div>
+      <div class="card" id="pagamentos-lista-card"><div id="pagamentos-lista"></div></div>
+    </section>
+
+    <section id="view-historico" class="view">
+      <div class="card">
+        <div class="field" style="margin-bottom:14px"><label for="historico-cliente">Cliente</label><select id="historico-cliente"><option value="todos">Todos os clientes</option></select></div>
+        <div class="chip-row" style="margin-bottom:0">
+          <button class="chip" data-periodo="7">7 dias</button>
+          <button class="chip active" data-periodo="30">Este mês</button>
+          <button class="chip" data-periodo="tudo">Tudo</button>
+          <button class="chip" data-periodo="exata">Data específica</button>
+        </div>
+        <div class="field" id="campo-historico-data" style="display:none; margin-top:14px;"><input type="date" id="historico-data-exata" style="padding: 8px; border: 1px solid #ccc; border-radius: 8px; width: 100%; font-family: inherit; font-size: 16px; background: transparent;"></div>
+      </div>
+      <div class="tiles">
+        <div class="tile"><div class="num" id="hist-cocos">0</div><div class="cap">cocos no período</div></div>
+        <div class="tile alt"><div class="num" id="hist-valor">R$ 0</div><div class="cap">faturado no período</div></div>
+      </div>
+      <div class="card"><canvas id="chart-canvas"></canvas></div>
+      <div class="card" id="historico-lista-card"><div id="historico-lista"></div></div>
+    </section>
+
+    <section id="view-gastos" class="view">
+      <div class="section-title">Compra de coco</div>
+      <div id="aviso-sem-fornecedor" class="empty-state" style="display:none; margin-bottom: 12px; padding: 12px;">
+        <span class="emoji">🚚</span><div class="title" style="font-size:16px">Sem fornecedores</div><div class="desc">Cadastre um fornecedor para registrar compras.</div>
+        <button class="btn btn-primary" id="btn-cadastrar-primeiro-forn" style="margin-top:10px">Cadastrar Fornecedor</button>
+      </div>
+      <div class="card" id="form-compra-card">
+        <div class="field">
+          <label for="compra-fornecedor">Fornecedor</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="compra-fornecedor" style="flex: 1;"></select>
+            <button type="button" class="btn btn-outline" id="btn-edit-fornecedor" style="width: 44px; padding: 0; font-size: 16px;" title="Editar">✎</button>
+            <button type="button" class="btn btn-outline" id="btn-add-fornecedor" style="width: 44px; padding: 0; font-size: 20px;" title="Novo">+</button>
+          </div>
+        </div>
+        <div class="field"><label for="compra-qtd">Quantidade comprada</label><input type="number" id="compra-qtd" inputmode="numeric" min="0" placeholder="0"></div>
+        <div class="field"><label for="compra-data">Data da compra</label><input type="date" id="compra-data"></div>
+        <div class="total-preview"><span class="label">Valor Total da Compra</span><span class="value" id="compra-total-preview">R$ 0,00</span></div>
+        <button class="btn btn-primary" id="btn-salvar-compra">Registrar compra</button>
+      </div>
+
+      <div class="section-title">Outros gastos</div>
+      <div class="card">
+        <div class="field">
+          <label for="despesa-categoria">Categoria</label>
+          <select id="despesa-categoria"><option value="Combustível">Combustível</option><option value="Manutenção">Manutenção</option><option value="Transporte">Transporte</option><option value="Alimentação">Alimentação</option><option value="Outros">Outros</option></select>
+        </div>
+        <div class="field"><label for="despesa-descricao">Descrição (opcional)</label><input type="text" id="despesa-descricao" placeholder="Ex: Gasolina da moto"></div>
+        <div class="field"><label for="despesa-valor">Valor (R$)</label><input type="number" id="despesa-valor" inputmode="decimal" min="0" step="0.01" placeholder="Ex: 50.00"></div>
+        <div class="field"><label for="despesa-data">Data</label><input type="date" id="despesa-data"></div>
+        <button class="btn btn-primary" id="btn-salvar-despesa">Registrar gasto</button>
+      </div>
+
+      <div class="card" style="background: var(--surface-soft); margin-top: 22px;">
+        <div class="total-preview" style="margin-bottom: 0;"><span class="label">Dívida Total (Fornecedores)</span><span class="value" id="fornecedor-saldo" style="color: var(--danger)">R$ 0,00</span></div>
+        <div id="lista-saldos-fornecedores" style="margin-bottom: 16px;"></div>
+        <button class="btn btn-outline" id="btn-pagar-fornecedor">Registrar Pagamento ao Fornecedor</button>
+      </div>
+
+      <div class="section-title">Resumo</div>
+      <div class="chip-row">
+        <button class="chip" data-periodo-gastos="7">7 dias</button>
+        <button class="chip active" data-periodo-gastos="30">Este mês</button>
+        <button class="chip" data-periodo-gastos="tudo">Tudo</button>
+      </div>
+      <div class="tiles">
+        <div class="tile"><div class="num" id="gastos-cocos-comprados">0</div><div class="cap">cocos comprados</div></div>
+        <div class="tile alt"><div class="num" id="gastos-total">R$ 0</div><div class="cap">gasto total no período</div></div>
+      </div>
+      <div class="card" id="gastos-lista-card"><div id="gastos-lista"></div></div>
+    </section>
+
+    <section id="view-estoque" class="view">
+      <div class="tiles"><div class="tile"><div class="num" id="estoque-atual">0</div><div class="cap">Cocos em estoque</div></div></div>
+      
+      <button class="btn btn-outline" id="btn-ajustar-estoque" style="margin-bottom: 20px;">Ajustar Estoque (Brindes / Perdas)</button>
+      
+      <div class="card">
+        <div class="total-preview"><span class="label">Total Comprado (Entradas)</span><span class="value" id="estoque-entradas" style="color:var(--positive)">0</span></div>
+        <div class="total-preview"><span class="label">Total Ajustes (Brindes/Perdas)</span><span class="value" id="estoque-ajustes">0</span></div>
+        <div class="total-preview" style="margin-bottom: 0;"><span class="label">Total Entregue (Saídas)</span><span class="value" id="estoque-saidas" style="color:var(--danger)">0</span></div>
+      </div>
+      <div class="section-title">Extrato de Movimentação</div>
+      <div class="card" id="estoque-lista-card"><div id="estoque-lista"></div></div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab-btn active" data-view="entregar"><span class="icon">🥥</span>Entregas</button>
+    <button class="tab-btn" data-view="clientes"><span class="icon">👤</span>Clientes</button>
+    <button class="tab-btn" data-view="pagamentos"><span class="icon">💰</span>Pagamentos</button>
+    <button class="tab-btn" data-view="historico"><span class="icon">📊</span>Histórico</button>
+    <button class="tab-btn" data-view="gastos" id="tab-gastos" style="display:none;"><span class="icon">🧾</span>Financeiro</button>
+    <button class="tab-btn" data-view="dre" id="tab-dre" style="display:none;"><span class="icon">📈</span>DRE</button>
+    <button class="tab-btn" data-view="estoque" id="tab-estoque" style="display:none;"><span class="icon">📦</span>Estoque</button>
+  </nav>
+
+</div>
+
+<div class="sheet-backdrop" id="sheet-backdrop">
+  <div class="sheet" id="sheet"><div class="sheet-handle"></div><div id="sheet-content"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>
